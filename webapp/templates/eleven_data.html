@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages(category_filter=["info"]) %}
+            {% if messages %}
+
+                {% for message in messages %}
+                    <div class="alert alert-success alert-dismissible fade show text-center mt-3" role="alert">
+                        <i class="fa-solid fa-circle-check mr-1"></i>
+                        <strong>{{ message }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        {% with errors = get_flashed_messages(category_filter=["error"]) %}
+            {% if errors %}
+
+                {% for msg in errors %}
+                    <div class="alert alert-danger alert-dismissible fade show text-center mt-3" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation" style="color: rgb(255, 61, 61);"></i>
+                        <strong>{{ msg }}</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="text-center">
+        <img class="img-fluid rounded mt-3" style="height: 100px; width: 100px;" src="../static/img/711 icon.png" alt="">
+    </div>
+    
+    <h1 class="text-center mt-3">7-Eleven Data Cleaning</h1>
+
+    <form action="/eleven_data" method="POST">
+        <div class="container">
+            <label class="form-label fw-semibold mt-4">Raw data folder PATH:</label>
+            <input type="text" class="form-control" name="path">
+            <div class="form-text mb-3">
+                <i class="fa-solid fa-circle-info"></i>
+                Copy the folder path you want to clean, and remove the quotations from the beginning and end of the
+                folder PATH.
+            </div>
+
+            <label class="form-label fw-semibold mt-4">Destination folder PATH:</label>
+            <input type="text" class="form-control" name="destination">
+            <div class="form-text">
+                <i class="fa-solid fa-circle-info"></i>
+                Copy the destination folder path where you will store the cleaned datasets, and remove quotations from
+                the
+                beginning and end of the folder PATH.
+            </div>
+
+            <div class="d-grid gap-2 col-6 mx-auto mt-5">
+                <input class="btn btn-success btn-lg" type="submit" value="Submit">
+            </div>
+
+        </div>
+    </form>
+{% endblock %}
