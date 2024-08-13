@@ -34,14 +34,26 @@
             {% endif %}
         {% endwith %}
     </div>
+
     <div class="text-center">
         <img class="img-fluid rounded mt-3" style="height: 100px; width: 100px;" src="../static/img/711 icon.png" alt="">
     </div>
     
-    <h1 class="text-center mt-3">7-Eleven Data Cleaning</h1>
 
-    <form action="/eleven_data" method="POST">
-        <div class="container">
+    <div class="container">
+        <h1 class="text-center mt-3">7-Eleven Data Cleaning</h1>
+
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Supplier
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('eleven') }}">Supplier Sales</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('scan_and_outbound') }}">Supplier Scan and Outbound</a></li>
+            </ul>
+        </div>
+
+        <form action="/eleven_data" method="POST">
             <label class="form-label fw-semibold mt-4">Raw data folder PATH:</label>
             <input type="text" class="form-control" name="path">
             <div class="form-text mb-3">
@@ -62,7 +74,7 @@
             <div class="d-grid gap-2 col-6 mx-auto mt-5">
                 <input class="btn btn-success btn-lg" type="submit" value="Submit">
             </div>
-
-        </div>
-    </form>
+        </form>
+    </div>
+    
 {% endblock %}

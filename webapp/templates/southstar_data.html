@@ -39,7 +39,17 @@
         <img class="img-fluid rounded mt-3" style="height: 100px; width: 100px;" src="../static/img/southstar icon.png" alt="">
     </div>
     <div class="container">
-        <h1 class="text-center mt-3">SSD Data Cleaning</h1>
+        <h1 class="text-center mt-3">SSD Data Cleaning (SKU Sales)</h1>
+
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              SKU
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="{{ url_for('southstar') }}">SKU Sales</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('ssd_transfers') }}">SKU Transfers</a></li>
+            </ul>
+          </div>
 
         <form action="/southstar_data" method="POST">
             <label class="form-label fw-semibold mt-4">Raw data folder PATH:</label>
@@ -48,13 +58,6 @@
                 <i class="fa-solid fa-circle-info"></i>
                 Copy the folder path you want to clean, and remove the quotations from the beginning and end of the
                 folder PATH.
-            </div>
-
-            <label class="form-label fw-semibold">No. of skip footer:</label>
-            <input type="text" class="form-control" name="skip_footer">
-            <div class="form-text mb-3">
-                <i class="fa-solid fa-circle-info"></i>
-                Number of footers to be removed from the dataset
             </div>
 
             <label class="form-label fw-semibold">Destination folder PATH:</label>
