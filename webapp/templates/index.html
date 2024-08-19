@@ -8,11 +8,12 @@
 <h1 class="text-center mt-5">Data Cleaning</h1>
 
 <div class="d-grid gap-2  col-6 mt-5 mx-auto">
-  <a class="btn btn-primary btn-lg" href="{{ url_for('sm') }}" type="button">SM Data</a>
   <a class="btn btn-danger btn-lg" href="{{ url_for('robinsons') }}" role="button">Robinsons Data</a>
+  <a class="btn btn-info btn-lg" href="{{ url_for('southstar') }}" type="button">Southstar</a>
   <a class="btn btn-primary btn-lg" href="{{ url_for('uncle_john') }}" style="background-color: #007cbc;" role="button">Uncle John's Data</a>
   <a class="btn btn-success btn-lg" href="{{ url_for('eleven') }}" type="button">7-Eleven</a>
+  <a class="btn btn-primary btn-lg" href="{{ url_for('sm') }}" type="button">SM Data</a>
   <a class="btn btn-warning btn-lg" href="{{ url_for('waltermart') }}" type="button">Waltermart</a>
-  <a class="btn btn-info btn-lg" href="{{ url_for('southstar') }}" type="button">Southstar</a>
+
 </div>
 {% endblock %}
