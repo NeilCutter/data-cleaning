@@ -13,7 +13,7 @@ def home_page():
 
 @app.route("/robinsons")
 def robinsons():
-    return render_template("robinsons_data.html")
+     return render_template("robinsons_data.html")
 
 @app.route("/uncle_john")
 def uncle_john():
@@ -57,41 +57,37 @@ def robinsons_cleaning():
         file_name = glob.glob1(path, "*.xlsx")
         # Loading data and cleaning
         for file in file_name:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                df = pd.read_excel(
-                    rf"{path}\{file}", skipfooter=2, engine="openpyxl"
-                )
+            df = pd.read_excel(rf"{path}\{file}", skipfooter=2, engine="openpyxl")
 
-                # Skip headers
-                df = df.set_index("Unnamed: 0")
-                num_row = df.index.get_loc("SKU CODE")
-                df = df.reset_index()
-                df.iloc[:num_row].index.tolist()
-                df = df.drop(df.iloc[:num_row].index.tolist())
-                new_header = df.iloc[0]
-                df.columns = new_header
-                df = df.reset_index(drop=True)
-                df = df.drop([0, 1])
+            # Skip headers
+            df = df.set_index("Unnamed: 0")
+            num_row = df.index.get_loc("SKU CODE")
+            df = df.reset_index()
+            df.iloc[:num_row].index.tolist()
+            df = df.drop(df.iloc[:num_row].index.tolist())
+            new_header = df.iloc[0]
+            df.columns = new_header
+            df = df.reset_index(drop=True)
+            df = df.drop([0, 1])
 
-                # Data type Convertion
-                convert_dtype = {
-                    "SKU CODE": str,
-                    "UPC": str,
-                    "STORE CODE": str,
-                    "UNITS SOLD TY": int,
-                    "NET SALES TY": float,
-                    "TAX TY": float,
-                    "GROSS SALES TY": float,
-                }
-                df = df.astype(convert_dtype)
+            # Data type Convertion
+            convert_dtype = {
+                "SKU CODE": str,
+                "UPC": str,
+                "STORE CODE": str,
+                "UNITS SOLD TY": int,
+                "NET SALES TY": float,
+                "TAX TY": float,
+                "GROSS SALES TY": float,
+            }
+            df = df.astype(convert_dtype)
 
-                # Adding new column df[DATE]
-                month = file.split(".")[0]
-                day = file.split(".")[1]
-                year = file.split(".")[2]
-                df["DATE"] = f"{month}-{day}-{year}"
-                dataset.append(df)
+            # Adding new column df[DATE]
+            month = file.split(".")[0]
+            day = file.split(".")[1]
+            year = file.split(".")[2]
+            df["DATE"] = f"{month}-{day}-{year}"
+            dataset.append(df)
 
         df = pd.concat(dataset)
         columns = df.columns.tolist()
@@ -570,3 +566,8 @@ def supplier_scan_and_outbound():
         flash("Cleaning completed without issues", "info")
         return redirect(url_for("scan_and_outbound"))
     return render_template("scan_and_outbound.html")
+
+
+
+
+    
