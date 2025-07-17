@@ -4,8 +4,24 @@ from webapp import glob
 from webapp import warnings
 from webapp import data_loading
 from webapp import os
+from webapp import filename_convertion
 import xml.etree.ElementTree as et
+from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 
+connection_url = URL.create(
+    "mssql+pyodbc",
+    username="sa",
+    password="N3x+r@d3#",
+    host="sqldb-svr",
+    port=1433,
+    database="NxtrdDatabase",
+    query={
+        "driver": "ODBC Driver 17 for SQL Server",
+        "TrustServerCertificate": "yes",
+    }
+)
+engine = create_engine(connection_url)
 
 @app.route("/")
 def home_page():
@@ -13,7 +29,7 @@ def home_page():
 
 @app.route("/robinsons")
 def robinsons():
-     return render_template("robinsons_data.html")
+    return render_template("robinsons_data.html")
 
 @app.route("/uncle_john")
 def uncle_john():
@@ -54,40 +70,46 @@ def robinsons_cleaning():
         destination = request.form["destination"]
         dataset = []
         
+        filename_convertion.filenames_to_dates(path)
+
         file_name = glob.glob1(path, "*.xlsx")
         # Loading data and cleaning
         for file in file_name:
-            df = pd.read_excel(rf"{path}\{file}", skipfooter=2, engine="openpyxl")
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                df = pd.read_excel(
+                    rf"{path}\{file}", skipfooter=2, engine="openpyxl"
+                )
 
-            # Skip headers
-            df = df.set_index("Unnamed: 0")
-            num_row = df.index.get_loc("SKU CODE")
-            df = df.reset_index()
-            df.iloc[:num_row].index.tolist()
-            df = df.drop(df.iloc[:num_row].index.tolist())
-            new_header = df.iloc[0]
-            df.columns = new_header
-            df = df.reset_index(drop=True)
-            df = df.drop([0, 1])
+                # Skip headers
+                df = df.set_index("Unnamed: 0")
+                num_row = df.index.get_loc("SKU CODE")
+                df = df.reset_index()
+                df.iloc[:num_row].index.tolist()
+                df = df.drop(df.iloc[:num_row].index.tolist())
+                new_header = df.iloc[0]
+                df.columns = new_header
+                df = df.reset_index(drop=True)
+                df = df.drop([0, 1])
 
-            # Data type Convertion
-            convert_dtype = {
-                "SKU CODE": str,
-                "UPC": str,
-                "STORE CODE": str,
-                "UNITS SOLD TY": int,
-                "NET SALES TY": float,
-                "TAX TY": float,
-                "GROSS SALES TY": float,
-            }
-            df = df.astype(convert_dtype)
+                # Data type Convertion
+                convert_dtype = {
+                    "SKU CODE": str,
+                    "UPC": str,
+                    "STORE CODE": str,
+                    "UNITS SOLD TY": float,
+                    "NET SALES TY": float,
+                    "TAX TY": float,
+                    "GROSS SALES TY": float,
+                }
+                df = df.astype(convert_dtype)
 
-            # Adding new column df[DATE]
-            month = file.split(".")[0]
-            day = file.split(".")[1]
-            year = file.split(".")[2]
-            df["DATE"] = f"{month}-{day}-{year}"
-            dataset.append(df)
+                # Adding new column df[DATE]
+                month = file.split(".")[0]
+                day = file.split(".")[1]
+                year = file.split(".")[2]
+                df["DATE"] = f"{month}-{day}-{year}"
+                dataset.append(df)
 
         df = pd.concat(dataset)
         columns = df.columns.tolist()
@@ -116,10 +138,13 @@ def robinsons_cleaning():
 @app.route("/uncle_john_data", methods=["GET", "POST"])
 def uncle_john_cleaning():
     try:
-        path = request.form["path"]
-        destination = request.form["destination"]
+        # path = request.form["path"]
+        # destination = request.form["destination"]
+        path = r"C:\Users\Nextrade\Downloads\new_dataset\Uncle_John\SKU Sales\2025\July"
+        destination = r"C:\Users\Nextrade\Downloads\sales_data\uj\2025"
+        filename_convertion.filenames_to_dates(path)
+
         dataset = []
-        
         file_name = glob.glob1(path, "*.xlsx")
         # Loading data and cleaning
         for file in file_name:
@@ -185,8 +210,11 @@ def uncle_john_cleaning():
 
 @app.route("/sm_data", methods=["GET", "POST"])
 def sm_cleaning():
-    path = request.form["path"]
-    destination = request.form["destination"]
+    # path = request.form["path"]
+    # destination = request.form["destination"]
+    path = r"C:\Users\Nextrade\Downloads\new_dataset\SM\2025\July"
+    destination = r"C:\Users\Nextrade\Downloads\sales_data\sm\2025"
+
     file_name = glob.glob1(path, "*.xml")
 
     dataset = []
@@ -247,7 +275,7 @@ def sm_cleaning():
             df["TotalAmount"] = df["TotalAmount"].replace(r"\,", "", regex=True)
 
             convert_dtype = {
-                "Qty": int,
+                "Qty": float,
                 "NVAT": float,
                 "VAT": float,
                 "TOTAL": float,
@@ -279,8 +307,11 @@ def sm_cleaning():
 
 @app.route("/eleven_data", methods=["GET", "POST"])
 def eleven_cleaning():
-    path = request.form["path"]
-    destination = request.form["destination"]
+    # path = request.form["path"]
+    # destination = request.form["destination"]
+    path = r"C:\Users\Nextrade\Downloads\new_dataset\7-Eleven\Supplier Sales\2025\July"
+    destination = r"C:\Users\Nextrade\Downloads\sales_data\711\2025\sales"
+
     file_name = glob.glob1(path, "*.xlsx")
 
     try:
@@ -319,50 +350,70 @@ def eleven_cleaning():
 @app.route("/waltermart_data", methods=["GET", "POST"])
 def waltermart_cleaning():
     try:
-        path = request.form["path"]
-        destination = request.form["destination"]
+        # path = request.form["path"]
+        # destination = request.form["destination"]
+        path = r"C:\Users\Nextrade\Downloads\new_dataset\Waltermart\2025\July"
+        destination = r"C:\Users\Nextrade\Downloads\sales_data\waltermart\2025"
+
         file_name = os.listdir(path)
         dataset = []
 
+        # for file in file_name:
+        #     df_1 = pd.read_xml(rf"{path}\{file}", xpath=".//header")
+        #     df_2 = pd.read_xml(rf"{path}\{file}", xpath=".//article")
+        #     df_3 = pd.read_xml(rf"{path}\{file}", xpath=".//footer")
+        #     df_4 = pd.concat([df_1, df_2], axis=1)
+        #     df = pd.concat([df_4, df_3], axis=1)
+
+        #     dataset.append(df)
+
+        #     df = pd.concat(dataset)
+        #     df.sort_values(by=["TransactDate"], inplace=True)
+        #     df.rename(columns={"Qty/Kilo":"Qty Kilo"}, inplace=True)
+        #     df["Qty"] = df["Qty"].replace(r"\.0+", "", regex=True)
+        #     df["TOTAL"] = df["TOTAL"].replace(r"\,", "", regex=True)
+        #     df["TotalAmount"] = df["TotalAmount"].replace(r"\,", "", regex=True)
+
+        #     convert_dtype = {"Qty": float,
+        #                     "TOTAL": float,
+        #                     "TotalAmount": float}
+
+        #     df = df.astype(convert_dtype)
+        #     orig_columns = df.columns.tolist()
+        #     column_names = ['Company Name','Document Title','Date','Time','Vendor Code','Vendor Name','Transaction Date','Note',
+        #                     'SKU#','BarcodeDescription','UOM','Qty Kilo','Sales Amount','Total','Site Code','Site Name','ImportantRemarks']
+        #     df.rename(columns=dict(zip(orig_columns, column_names)), inplace=True)
+
+        #     df["Barcode"] = df["BarcodeDescription"].apply(lambda x: x.split()[0])
+        #     df["Description"] = df["BarcodeDescription"].replace(regex=r'^\d+\s+', value="")
+
+        #     columns = ['Company Name', 'Document Title', 'Date', 'Time', 'Vendor Name', 'Vendor Code', 'Transaction Date', 
+        #    'Note', 'SKU#','Barcode', 'Description', 'UOM', 'Qty Kilo', 'Sales Amount', 'Site Code', 'Site Name', 'Total']
+
+
         for file in file_name:
-            df_1 = pd.read_xml(rf"{path}\{file}", xpath=".//header")
-            df_2 = pd.read_xml(rf"{path}\{file}", xpath=".//article")
-            df_3 = pd.read_xml(rf"{path}\{file}", xpath=".//footer")
-            df_4 = pd.concat([df_1, df_2], axis=1)
-            df = pd.concat([df_4, df_3], axis=1)
+            data = pd.read_csv(rf"{path}\\{file}")
+            dataset.append(data)
 
-            dataset.append(df)
+        df = pd.concat(dataset)
 
-            df = pd.concat(dataset)
-            df.sort_values(by=["TransactDate"], inplace=True)
+        orig_columns = ['Company Name', 'Document Title', 'Date', 'Time', 'Vendor Name',
+            'Vendor Code', 'Transaction Date', 'Note', 'SKU#', 'Barcode',
+            'Description', 'UOM', 'Qty/Kilo', 'Sales Amount', 'Site Code',
+            'Site Name', 'Total']
 
-            df["Qty"] = df["Qty"].replace(r"\.0+", "", regex=True)
-            df["TOTAL"] = df["TOTAL"].replace(r"\,", "", regex=True)
-            df["TotalAmount"] = df["TotalAmount"].replace(r"\,", "", regex=True)
+        df = df[orig_columns]
+        df.rename(columns={'Qty/Kilo': 'Qty Kilo'}, inplace=True)
+        columns = df.columns.tolist()
 
-            convert_dtype = {"Qty": int,
-                            "TOTAL": float,
-                            "TotalAmount": float}
 
-            df = df.astype(convert_dtype)
-            orig_columns = df.columns.tolist()
-            column_names = ['Company Name','Document Title','Date','Time','Vendor Code','Vendor Name','Transaction Date','Note',
-                            'SKU#','BarcodeDescription','UOM','Qty/Kilo','Sales Amount','Total','Site Code','Site Name','ImportantRemarks']
-            df.rename(columns=dict(zip(orig_columns, column_names)), inplace=True)
+        df["year"] = pd.DatetimeIndex(df['Transaction Date']).year
+        df["month"] = pd.DatetimeIndex(df['Transaction Date']).month
 
-            df["Barcode"] = df["BarcodeDescription"].apply(lambda x: x.split()[0])
-            df["Description"] = df["BarcodeDescription"].replace(regex=r'^\d+\s+', value="")
+        years = df["year"].unique().tolist()
+        months = df["month"].unique().tolist()
 
-            columns = ['Company Name', 'Document Title', 'Date', 'Time', 'Vendor Name', 'Vendor Code', 'Transaction Date', 
-           'Note', 'SKU#','Barcode', 'Description', 'UOM', 'Qty/Kilo', 'Sales Amount', 'Site Code', 'Site Name', 'Total']
-
-            df["year"] = pd.DatetimeIndex(df['Transaction Date']).year
-            df["month"] = pd.DatetimeIndex(df['Transaction Date']).month
-
-            years = df["year"].unique().tolist()
-            months = df["month"].unique().tolist()
-
-            data_loading.export_to_excel(df, years, months, destination, columns)
+        data_loading.export_to_excel(df, years, months, destination, columns)
 
     except (OSError, FileNotFoundError, UnboundLocalError, ValueError):
         flash("Invalid Input. Please enter the correct PATH location.", 'error')
@@ -378,10 +429,16 @@ def waltermart_cleaning():
 @app.route("/southstar_data", methods=["GET", "POST"])
 def southstar_cleaning():
     try:
-        path = request.form["path"]
-        destination = request.form["destination"]    
-        file_name = glob.glob1(path, "*.xls")
+        # path = request.form["path"]
+        # destination = request.form["destination"]
+        # print(path)
+        # print(destination)
+        path = r"C:\Users\Nextrade\Downloads\new_dataset\Southstar\SKU Sales\2025\July"
+        destination = r"C:\Users\Nextrade\Downloads\sales_data\ssd\2025"
 
+        filename_convertion.filenames_to_dates(path)
+
+        file_name = glob.glob1(path, "*.xls")
         dataset = []
         # Loading data and cleaning
         for file in file_name:
@@ -551,6 +608,8 @@ def supplier_scan_and_outbound():
 
         if supplier == "Outbound":
             df.to_excel(rf"{destination}\Supplier_Outbound.xlsx", index=False)
+            df.to_sql("OUTBOUND_711_RAW", con=engine, index=False, if_exists="append")
+
         elif supplier == "Scan":
             df.to_excel(rf"{destination}\SupplierOSAwithDeliveryandSales.xlsx", index=False)
         else:
