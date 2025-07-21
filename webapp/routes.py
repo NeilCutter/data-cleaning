@@ -4,7 +4,7 @@ from webapp import glob
 from webapp import warnings
 from webapp import data_loading
 from webapp import os
-from webapp import filename_convertion
+from webapp import filename_converter
 import xml.etree.ElementTree as et
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
@@ -70,7 +70,7 @@ def robinsons_cleaning():
         destination = request.form["destination"]
         dataset = []
         
-        filename_convertion.filenames_to_dates(path)
+        filename_converter.filenames_to_dates(path)
 
         file_name = glob.glob1(path, "*.xlsx")
         # Loading data and cleaning
@@ -142,7 +142,7 @@ def uncle_john_cleaning():
         # destination = request.form["destination"]
         path = r"C:\Users\Nextrade\Downloads\new_dataset\Uncle_John\SKU Sales\2025\July"
         destination = r"C:\Users\Nextrade\Downloads\sales_data\uj\2025"
-        filename_convertion.filenames_to_dates(path)
+        filename_converter.filenames_to_dates(path)
 
         dataset = []
         file_name = glob.glob1(path, "*.xlsx")
@@ -436,7 +436,7 @@ def southstar_cleaning():
         path = r"C:\Users\Nextrade\Downloads\new_dataset\Southstar\SKU Sales\2025\July"
         destination = r"C:\Users\Nextrade\Downloads\sales_data\ssd\2025"
 
-        filename_convertion.filenames_to_dates(path)
+        filename_converter.filenames_to_dates(path)
 
         file_name = glob.glob1(path, "*.xls")
         dataset = []
