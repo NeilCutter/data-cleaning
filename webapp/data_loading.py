@@ -2,14 +2,25 @@ from webapp import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+USERNAME:str = os.getenv("DB_USER")
+PASSWORD:str = os.getenv("DB_PASS")
+HOST:str = os.getenv("DB_HOST")
+PORT:int = os.getenv("DB_PORT")
+DATABASE:str = os.getenv("DB_NAME")
+MONTH:int = os.getenv("MONTH")
+YEAR:int = os.getenv("YEAR")
 
 connection_url = URL.create(
     "mssql+pyodbc",
-    username="sa",
-    password="N3x+r@d3#",
-    host="sqldb-svr",
-    port=1433,
-    database="NxtrdDatabase",
+    username=USERNAME,
+    password=PASSWORD,
+    host=HOST,
+    port=PORT,
+    database=DATABASE,
     query={
         "driver": "ODBC Driver 17 for SQL Server",
         "TrustServerCertificate": "yes",
@@ -17,7 +28,7 @@ connection_url = URL.create(
 )
 engine = create_engine(connection_url)
 
-MONTH_NAME = {
+MONTH_NAMES = {
     1: "January",
     2: "February",
     3: "March",
@@ -36,11 +47,11 @@ def export_to_excel(df, years, months, destination, columns):
     for year in years:
         for month in months:
             df[(df["year"] == year) & (df["month"] == month)].to_excel(
-                rf"{destination}\{MONTH_NAME[month]}-{year}.xlsx",
+                rf"{destination}\{MONTH_NAMES[month]}-{year}.xlsx",
                 index=False,
                 columns=columns
             )
-    df = df[(df["year"] == 2025) & (df["month"] == 7)]
+    df = df[(df["year"] == 2025) & (df["month"] == 8)]
     df = df[columns]
 
     if destination.split("\\")[6] == "sales":
