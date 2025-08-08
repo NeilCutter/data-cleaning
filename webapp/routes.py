@@ -4,18 +4,28 @@ from webapp import glob
 from webapp import warnings
 from webapp import data_loading
 from webapp import os
-from webapp import filename_converter
+from webapp import filename_convertion
 import xml.etree.ElementTree as et
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
+from dotenv import load_dotenv
+
+load_dotenv()
+
+USERNAME:str = os.getenv("DB_USER")
+PASSWORD:str = os.getenv("DB_PASS")
+HOST:str = os.getenv("DB_HOST")
+PORT:int = os.getenv("DB_PORT")
+DATABASE:str = os.getenv("DB_NAME")
+MONTH_NAME:str = os.getenv("MONTH_NAME")
 
 connection_url = URL.create(
     "mssql+pyodbc",
-    username=os.getenv('USERNAME'),
-    password=os.getenv('PASSWORD'),
-    host=os.getenv('HOST'),
-    port=os.getenv('PORT'),
-    database=os.getenv('DATABASE'),
+    username=USERNAME,
+    password=PASSWORD,
+    host=HOST,
+    port=PORT,
+    database=DATABASE,
     query={
         "driver": "ODBC Driver 17 for SQL Server",
         "TrustServerCertificate": "yes",
@@ -70,7 +80,7 @@ def robinsons_cleaning():
         destination = request.form["destination"]
         dataset = []
         
-        filename_converter.filenames_to_dates(path)
+        filename_convertion.filenames_to_dates(path)
 
         file_name = glob.glob1(path, "*.xlsx")
         # Loading data and cleaning
@@ -140,9 +150,10 @@ def uncle_john_cleaning():
     try:
         # path = request.form["path"]
         # destination = request.form["destination"]
-        path = r"C:\Users\Nextrade\Downloads\new_dataset\Uncle_John\SKU Sales\2025\July"
+        path = rf"C:\Users\Nextrade\Downloads\new_dataset\Uncle_John\SKU Sales\2025\{MONTH_NAME}"
+        
         destination = r"C:\Users\Nextrade\Downloads\sales_data\uj\2025"
-        filename_converter.filenames_to_dates(path)
+        filename_convertion.filenames_to_dates(path)
 
         dataset = []
         file_name = glob.glob1(path, "*.xlsx")
@@ -212,7 +223,7 @@ def uncle_john_cleaning():
 def sm_cleaning():
     # path = request.form["path"]
     # destination = request.form["destination"]
-    path = r"C:\Users\Nextrade\Downloads\new_dataset\SM\2025\July"
+    path = rf"C:\Users\Nextrade\Downloads\new_dataset\SM\2025\{MONTH_NAME}"
     destination = r"C:\Users\Nextrade\Downloads\sales_data\sm\2025"
 
     file_name = glob.glob1(path, "*.xml")
@@ -309,7 +320,7 @@ def sm_cleaning():
 def eleven_cleaning():
     # path = request.form["path"]
     # destination = request.form["destination"]
-    path = r"C:\Users\Nextrade\Downloads\new_dataset\7-Eleven\Supplier Sales\2025\July"
+    path = rf"C:\Users\Nextrade\Downloads\new_dataset\7-Eleven\Supplier Sales\2025\{MONTH_NAME}"
     destination = r"C:\Users\Nextrade\Downloads\sales_data\711\2025\sales"
 
     file_name = glob.glob1(path, "*.xlsx")
@@ -352,7 +363,7 @@ def waltermart_cleaning():
     try:
         # path = request.form["path"]
         # destination = request.form["destination"]
-        path = r"C:\Users\Nextrade\Downloads\new_dataset\Waltermart\2025\July"
+        path = rf"C:\Users\Nextrade\Downloads\new_dataset\Waltermart\2025\{MONTH_NAME}"
         destination = r"C:\Users\Nextrade\Downloads\sales_data\waltermart\2025"
 
         file_name = os.listdir(path)
@@ -433,10 +444,10 @@ def southstar_cleaning():
         # destination = request.form["destination"]
         # print(path)
         # print(destination)
-        path = r"C:\Users\Nextrade\Downloads\new_dataset\Southstar\SKU Sales\2025\July"
+        path = rf"C:\Users\Nextrade\Downloads\new_dataset\Southstar\SKU Sales\2025\{MONTH_NAME}"
         destination = r"C:\Users\Nextrade\Downloads\sales_data\ssd\2025"
 
-        filename_converter.filenames_to_dates(path)
+        filename_convertion.filenames_to_dates(path)
 
         file_name = glob.glob1(path, "*.xls")
         dataset = []
@@ -625,8 +636,3 @@ def supplier_scan_and_outbound():
         flash("Cleaning completed without issues", "info")
         return redirect(url_for("scan_and_outbound"))
     return render_template("scan_and_outbound.html")
-
-
-
-
-    
