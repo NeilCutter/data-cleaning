@@ -231,50 +231,62 @@ def sm_cleaning():
     dataset = []
 
     try:
-        # Loading data and cleaning
+        ## -------------------- OLD CODE -----------------------
+        # # Loading data and cleaning
+        # for file in file_name:
+        #     tree = et.parse(rf"{path}\{file}")
+        #     root = tree.getroot()
+        #     for document in root.findall(".//document"):
+        #         for article in document.find(".//details").findall(".//article"):
+        #             data = {
+        #                 "CompanyName": document.find(".//header").find(".//CompanyName").text,
+        #                 "DocumentType": document.find(".//header").find(".//DocumentType").text,
+        #                 "PostDate": document.find(".//header").find(".//PostDate").text,
+        #                 "PostTime": document.find(".//header").find(".//PostTime").text,
+        #                 "VendorCode": document.find(".//header").find(".//VendorCode").text,
+        #                 "VendorName": document.find(".//header").find(".//VendorName").text,
+        #                 "TransactDate": document.find(".//header").find(".//TransactDate").text,
+        #                 "Note": document.find(".//header").find(".//Note").text,
+        #                 "ArticleNumber": article.find(".//ArticleNumber").text,
+        #                 "BarcodeDescription": article.find(".//BarcodeDescription").text,
+        #                 "UOM": article.find(".//UOM").text,
+        #                 "Qty": article.find(".//Qty").text,
+        #                 "NVAT": article.find(".//NVAT").text,
+        #                 "VAT": article.find(".//VAT").text,
+        #                 "TOTAL": article.find(".//TOTAL").text,
+        #                 "TotalAmount": document.find(".//footer").find(".//TotalAmount").text,
+        #                 "SiteCode": document.find(".//footer").find(".//SiteCode").text,
+        #                 "SiteName": document.find(".//footer").find(".//SiteName").text,
+        #                 "ImportantRemarks": document.find(".//footer").find(".//ImportantRemarks").text,
+        #             }
+        #             dataset.append(data)
+# ----------------------------------------------------------------------------------        
         for file in file_name:
-            tree = et.parse(rf"{path}\{file}")
+            tree = et.parse(rf"{path}\{file}", parser=et.XMLParser(encoding='iso-8859-5'))
             root = tree.getroot()
-            for document in root.findall(".//document"):
-                for article in document.find(".//details").findall(".//article"):
-                    data = {
-                        "CompanyName": document.find(".//header")
-                        .find(".//CompanyName")
-                        .text,
-                        "DocumentType": document.find(".//header")
-                        .find(".//DocumentType")
-                        .text,
-                        "PostDate": document.find(".//header").find(".//PostDate").text,
-                        "PostTime": document.find(".//header").find(".//PostTime").text,
-                        "VendorCode": document.find(".//header")
-                        .find(".//VendorCode")
-                        .text,
-                        "VendorName": document.find(".//header")
-                        .find(".//VendorName")
-                        .text,
-                        "TransactDate": document.find(".//header")
-                        .find(".//TransactDate")
-                        .text,
-                        "Note": document.find(".//header").find(".//Note").text,
-                        "ArticleNumber": article.find(".//ArticleNumber").text,
-                        "BarcodeDescription": article.find(
-                            ".//BarcodeDescription"
-                        ).text,
-                        "UOM": article.find(".//UOM").text,
-                        "Qty": article.find(".//Qty").text,
-                        "NVAT": article.find(".//NVAT").text,
-                        "VAT": article.find(".//VAT").text,
-                        "TOTAL": article.find(".//TOTAL").text,
-                        "TotalAmount": document.find(".//footer")
-                        .find(".//TotalAmount")
-                        .text,
-                        "SiteCode": document.find(".//footer").find(".//SiteCode").text,
-                        "SiteName": document.find(".//footer").find(".//SiteName").text,
-                        "ImportantRemarks": document.find(".//footer")
-                        .find(".//ImportantRemarks")
-                        .text,
-                    }
-                    dataset.append(data)
+            for row in root.findall(".//row"):
+                data = {
+                    "CompanyName": row.find(".//CompanyName").text,
+                    "DocumentType": row.find(".//DocumentType").text,
+                    "PostDate": row.find(".//PostDate").text,
+                    "PostTime": row.find(".//PostTime").text,
+                    "VendorCode": row.find(".//VendorCode").text,
+                    "VendorName": row.find(".//VendorName").text,
+                    "TransactDate": row.find(".//TransactDate").text,
+                    "Note": row.find(".//Note").text,
+                    "ArticleNumber": row.find(".//ArticleNumber").text,
+                    "BarcodeDescription": row.find(".//BarcodeDescription").text,
+                    "UOM": row.find(".//UOM").text,
+                    "Qty": row.find(".//Qty").text,
+                    "NVAT": row.find(".//NVAT").text,
+                    "VAT": row.find(".//VAT").text,
+                    "TOTAL": row.find(".//TOTAL").text,
+                    "TotalAmount": row.find(".//TotalAmount").text,
+                    "SiteCode": row.find(".//SiteCode").text,
+                    "SiteName": row.find(".//SiteName").text,
+                    "ImportantRemarks": row.find(".//ImportantRemarks").text,
+                }
+                dataset.append(data)
             df = pd.DataFrame(dataset)
             df.sort_values(by=["TransactDate"], inplace=True)
 
