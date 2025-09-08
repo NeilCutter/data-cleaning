@@ -11,8 +11,8 @@ PASSWORD:str = os.getenv("DB_PASS")
 HOST:str = os.getenv("DB_HOST")
 PORT:int = os.getenv("DB_PORT")
 DATABASE:str = os.getenv("DB_NAME")
-MONTH:int = os.getenv("MONTH")
-YEAR:int = os.getenv("YEAR")
+MONTH:int = int(os.getenv("MONTH"))
+YEAR:int = int(os.getenv("YEAR"))
 
 connection_url = URL.create(
     "mssql+pyodbc",
@@ -51,7 +51,7 @@ def export_to_excel(df, years, months, destination, columns):
                 index=False,
                 columns=columns
             )
-    df = df[(df["year"] == 2025) & (df["month"] == 8)]
+    df = df[(df["year"] == YEAR) & (df["month"] == MONTH)]
     df = df[columns]
 
     if destination.split("\\")[6] == "sales":
@@ -72,3 +72,13 @@ def export_to_excel(df, years, months, destination, columns):
         df.to_sql("OFFTAKE_711_RAW", con=engine, index=False, if_exists="append")
     else:
         print("No Equivalent File")
+        
+        
+    # if destination.split("\\")[6] == "sales":
+    #     df.to_sql("OFFTAKE_ROBINSON_RAW_DAILY_ADJ", con=engine, index=False, if_exists="append")
+    # elif destination.split("\\")[6] == "ecom":
+    #     df.to_sql("OFFTAKE_ROBINSON-ECOM_RAW_DAILY", con=engine, index=False, if_exists="append")
+    # elif destination.split("\\")[6] == "GRANEX":
+    #     df.to_sql("OFFTAKE_ROBINSON_RAW_DAILY_ADJ", con=engine, index=False, if_exists="append")
+    # else:
+    #     print("No Equivalent File")
